@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leipzig Tour - Verlorene Pracht</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a1a1a);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .intro-box {
+            background: #c0392b;
+            color: #fff;
+            padding: 10px 15px;
+            margin: 15px 0 0 0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        nav {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        nav a {
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        nav a:hover, nav a.active {
+            background: #c0392b;
+        }
+        .stop {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .stop-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .stop-number {
+            background: #c0392b;
+            color: #fff;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .stop-title {
+            font-size: 1.2rem;
+        }
+        .stop-intro {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #aaa;
+            border-left: 3px solid #c0392b;
+        }
+        .images {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
+        }
+        .image-card {
+            flex: 0 0 85%;
+            scroll-snap-align: start;
+            background: #222;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .image-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            background: #111;
+        }
+        .image-card .caption {
+            padding: 12px;
+        }
+        .image-card .caption h3 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+        .image-card .dates {
+            font-size: 0.75rem;
+            color: #e74c3c;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .image-card .caption p {
+            font-size: 0.8rem;
+            color: #999;
+            line-height: 1.4;
+        }
+        .tag {
+            display: inline-block;
+            background: #27ae60;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .tag.destroyed {
+            background: #c0392b;
+        }
+        .tag.survived {
+            background: #27ae60;
+        }
+        .honorable {
+            background: #1e2a1e;
+        }
+        .sonstige {
+            background: #2a2a1e;
+        }
+
+        /* Detail Modal */
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.98);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .detail-modal.active {
+            display: block;
+        }
+        .detail-modal .close {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 1002;
+            background: rgba(0,0,0,0.7);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .detail-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 10px;
+        }
+        .detail-hero-image {
+            width: 100%;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            cursor: zoom-in;
+            margin-bottom: 20px;
+        }
+        .detail-hero-image img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 0;
+        }
+        .detail-content h2 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        /* Fullscreen Zoom Overlay */
+        .zoom-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.98);
+            z-index: 2000;
+            cursor: zoom-out;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .zoom-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-overlay img {
+            max-width: none;
+            width: 100%;
+            height: auto;
+            min-height: 100vh;
+            object-fit: contain;
+        }
+        .zoom-overlay .close {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 2001;
+            background: rgba(0,0,0,0.7);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            pointer-events: none;
+        }
+        .detail-dates {
+            background: #c0392b;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        .detail-dates span {
+            display: block;
+            margin: 3px 0;
+        }
+        .detail-section {
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .detail-section h4 {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .detail-section p, .detail-section ul {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .detail-section ul {
+            padding-left: 20px;
+        }
+        .detail-section li {
+            margin-bottom: 5px;
+        }
+        .detail-fact {
+            background: #333;
+            border-left: 3px solid #e74c3c;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+        .detail-today {
+            background: #1e3a1e;
+            border-left: 3px solid #27ae60;
+        }
+
+        @media (min-width: 768px) {
+            .image-card {
+                flex: 0 0 320px;
+            }
+            .image-card img {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Leipzig Tour</h1>
+        <p class="subtitle">Verlorene Pracht der Innenstadt</p>
+        <div class="intro-box">
+            <strong>4. Dezember 1943, 3:50 Uhr:</strong> 400 britische Bomber warfen 300.000 Bomben. 1.815 Tote, 43.100 Wohnungen zerstort. Fast alle Gebaude dieser Tour fielen in 35 Minuten.
+        </div>
+        <nav>
+            <a href="#stop1">1. Augustusplatz</a>
+            <a href="#stop2">2. Grimmaische</a>
+            <a href="#stop3">3. Markt</a>
+            <a href="#stop4">4. Thomasring</a>
+            <a href="#stop5">5. W.-Leuschner</a>
+            <a href="#stop6">Bonus</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- STOP 1: AUGUSTUSPLATZ -->
+        <section class="stop" id="stop1">
+            <div class="stop-header">
+                <div class="stop-number">1</div>
+                <h2 class="stop-title">Augustusplatz</h2>
+            </div>
+            <div class="stop-intro">
+                Leipzigs grosste Wunde. Die komplette Westseite wurde 1968 von der SED gesprengt - nicht vom Krieg zerstort!
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('uni-innenhof')">
+                    <img src="01_AUGUSTUSPLATZ_Universitaet_Innenhof.jpg" alt="Universitat Innenhof">
+                    <div class="caption">
+                        <h3>Universitat Innenhof</h3>
+                        <div class="dates">Erbaut 1831-1836 | Gesprengt 1968</div>
+                        <p>Hier kommen wir rein! Marmorbuste von Leibniz, Goethe, Lessing.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('wandelhalle')">
+                    <img src="01_AUGUSTUSPLATZ_Universitaet_Wandelhalle_Innen.jpg" alt="Wandelhalle">
+                    <div class="caption">
+                        <h3>Wandelhalle (Innen)</h3>
+                        <div class="dates">Umbau 1892-1897 | Gesprengt 1968</div>
+                        <p>23 m hoch, marmorverkleidet, romisches Tonnengewolbe.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('uni-pauliner')">
+                    <img src="01_AUGUSTUSPLATZ_Universitaet_mit_Paulinerkirche.jpg" alt="Universitat mit Paulinerkirche">
+                    <div class="caption">
+                        <h3>Universitat mit Paulinerkirche</h3>
+                        <div class="dates">Uni 1409 gegrundet | Gesprengt 1968</div>
+                        <p>Eine der altesten Universitaten Deutschlands.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('paulinerkirche')">
+                    <img src="01_AUGUSTUSPLATZ_Paulinerkirche.jpg" alt="Paulinerkirche">
+                    <div class="caption">
+                        <h3>Paulinerkirche <span class="tag destroyed">Gesprengt</span></h3>
+                        <div class="dates">Erbaut 1231 | Gesprengt 30.5.1968, 9:58 Uhr</div>
+                        <p>737 Jahre alt! Luther weihte sie 1545, Bach fuhrte Kantaten auf.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('uni-1896')">
+                    <img src="01_AUGUSTUSPLATZ_Universitaet_1896.jpg" alt="Universitat 1896">
+                    <div class="caption">
+                        <h3>Universitat 1896</h3>
+                        <div class="dates">Umbau 1892-1897 | Gesprengt 1968</div>
+                        <p>Beruhmte Studenten: Leibniz, Goethe, Lessing.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('augusteum')">
+                    <img src="01_AUGUSTUSPLATZ_Augusteum_Karyatiden.jpg" alt="Augusteum">
+                    <div class="caption">
+                        <h3>Augusteum mit Karyatiden</h3>
+                        <div class="dates">Erbaut 1831-1836 | Gesprengt 1968</div>
+                        <p>Musenfiguren von Rietschel - 2002 wiederentdeckt!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('alte-post')">
+                    <img src="01_AUGUSTUSPLATZ_Alte_Post_Oberpostdirektion.jpg" alt="Alte Post">
+                    <div class="caption">
+                        <h3>Alte Post <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1836-1838 | Zerstort 4.12.1943</div>
+                        <p>87 m Hauptfront. 6 allegorische Figuren auf dem Dach.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('hauptpost')">
+                    <img src="01_AUGUSTUSPLATZ_Hauptpost.jpg" alt="Hauptpost">
+                    <div class="caption">
+                        <h3>Hauptpost</h3>
+                        <div class="dates">Umbau 1881-1884 | Zerstort 4.12.1943</div>
+                        <p>Bis zum Vortag der Zerstorung noch in Betrieb!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('museum')">
+                    <img src="01_AUGUSTUSPLATZ_Museum_der_bildenden_Kuenste.jpg" alt="Museum">
+                    <div class="caption">
+                        <h3>Museum der bildenden Kunste <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1856-1858 | Zerstort 4.12.1943</div>
+                        <p>Baukosten: 150.875 Thaler, 18 Neugroschen, 1 Pfennig!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('panorama-aug')">
+                    <img src="01_AUGUSTUSPLATZ_Panorama_Bebauung.jpg" alt="Panorama">
+                    <div class="caption">
+                        <h3>Augustusplatz Panorama</h3>
+                        <div class="dates">Historische Ansicht</div>
+                        <p>Prachtvolle Bebauung vor der Zerstorung.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('matthaekirche')">
+                    <img src="01_AUGUSTUSPLATZ_Matthaekirche.jpg" alt="Matthaikirche">
+                    <div class="caption">
+                        <h3>Matthaikirche <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Neugotik | Zerstort 4.12.1943</div>
+                        <p>Vom Augustusplatz aus sichtbar.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('eckhaus')">
+                    <img src="01_AUGUSTUSPLATZ_Eckhaus.jpg" alt="Eckhaus">
+                    <div class="caption">
+                        <h3>Eckhaus Augustusplatz <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Grunderzeit | Zerstort 4.12.1943</div>
+                        <p>Elegantes Eckgebaude der Randbebauung.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('decke')">
+                    <img src="01_AUGUSTUSPLATZ_Universitaet_Decke_Innen.jpg" alt="Decke">
+                    <div class="caption">
+                        <h3>Universitatsgebaude (Decke)</h3>
+                        <div class="dates">19. Jh. | Gesprengt 1968</div>
+                        <p>Prachtvolle Deckenmalerei im Inneren.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STOP 2: GRIMMAISCHE STRASSE -->
+        <section class="stop" id="stop2">
+            <div class="stop-header">
+                <div class="stop-number">2</div>
+                <h2 class="stop-title">Grimmaische Strasse</h2>
+            </div>
+            <div class="stop-intro">
+                Die Prachtstrasse vom Markt zum Augustusplatz. Hier standen die grossten Messehauser und Kaffeehauser.
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('hansa-haus')">
+                    <img src="02_GRIMMAISCHE_Hansa_Haus_Messpalast.jpg" alt="Hansa-Haus">
+                    <div class="caption">
+                        <h3>Hansa-Haus <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1904-1906 | Zerstort 4.12.1943</div>
+                        <p>10.000 m2 - grosster Messebau seiner Zeit!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('cafe-felsche')">
+                    <img src="02_GRIMMAISCHE_Cafe_Felsche.jpg" alt="Cafe Felsche">
+                    <div class="caption">
+                        <h3>Cafe Felsche <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Gegrundet 1835 | Zerstort 4.12.1943</div>
+                        <p>108 Jahre Tradition! Koniglicher Hoflieferant.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STOP 3: MARKT -->
+        <section class="stop" id="stop3">
+            <div class="stop-header">
+                <div class="stop-number">3</div>
+                <h2 class="stop-title">Markt</h2>
+            </div>
+            <div class="stop-intro">
+                Das Herz Leipzigs. Hier stand bis 1946 ein 12 m hohes Siegesdenkmal - und darunter eine unterirdische Messehalle!
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('siegesdenkmal')">
+                    <img src="03_MARKT_Siegesdenkmal_Coloriert.jpg" alt="Siegesdenkmal">
+                    <div class="caption">
+                        <h3>Siegesdenkmal <span class="tag destroyed">Entfernt</span></h3>
+                        <div class="dates">Errichtet 1888 | Entfernt 12.12.1946</div>
+                        <p>12 m hoch, 46.409 Goldmark. Germania 3,80 m aus Kupfer.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('untergrund')">
+                    <img src="03_MARKT_Untergrund_Messhalle.jpg" alt="Untergrund-Messhalle">
+                    <div class="caption">
+                        <h3>Untergrund-Messhalle <span class="tag destroyed">Abgerissen</span></h3>
+                        <div class="dates">Erbaut 1924-1925 | Abgerissen 2005</div>
+                        <p>WELTWEIT ERSTES unterirdisches Ausstellungsgebaude!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STOP 4: THOMASRING -->
+        <section class="stop" id="stop4">
+            <div class="stop-header">
+                <div class="stop-number">4</div>
+                <h2 class="stop-title">Thomasring</h2>
+            </div>
+            <div class="stop-intro">
+                Gegenuber der Thomaskirche standen prachtvolle Gebaude - heute DDR-Zweckbauten.
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('commandantur')">
+                    <img src="04_THOMASRING_Commandantur.jpg" alt="Commandantur">
+                    <div class="caption">
+                        <h3>Commandantur <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1898-1899 | Zerstort 4.12.1943</div>
+                        <p>"Trompeterschlosschen" - goldene Trompeter auf dem Dach.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('centraltheater')">
+                    <img src="04_THOMASRING_Centraltheater.jpg" alt="Centraltheater">
+                    <div class="caption">
+                        <h3>Centraltheater <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1900-1902 | Zerstort 4.12.1943</div>
+                        <p>1.852 Sitze! Top 3 Operettenbuhne deutschsprachig.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STOP 5: WILHELM-LEUSCHNER-PLATZ -->
+        <section class="stop" id="stop5">
+            <div class="stop-header">
+                <div class="stop-number">5</div>
+                <h2 class="stop-title">Wilhelm-Leuschner-Platz</h2>
+            </div>
+            <div class="stop-intro">
+                Fruher umgeben von Prachtbauten. Die Albertina ist eines der wenigen erhaltenen Gebaude!
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('albertina')">
+                    <img src="05_WILHELM_LEUSCHNER_Bibliotheca_Albertina.jpg" alt="Albertina">
+                    <div class="caption">
+                        <h3>Bibliotheca Albertina <span class="tag survived">ERHALTEN</span></h3>
+                        <div class="dates">Erbaut 1887-1891 | Wiederaufbau 1992-2002</div>
+                        <p>107 m lang, 5,5 Mio. Bande, 4 Gutenberg-Bibeln!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('grassi')">
+                    <img src="05_WILHELM_LEUSCHNER_Grassimuseum_Alt.jpg" alt="Grassimuseum">
+                    <div class="caption">
+                        <h3>Altes Grassimuseum <span class="tag survived">ERHALTEN</span></h3>
+                        <div class="dates">Erbaut 1894-1897 | Heute Stadtbibliothek</div>
+                        <p>Stifter Grassi: 2.327.423,11 Goldmark!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('markthalle')">
+                    <img src="05_WILHELM_LEUSCHNER_Markthalle.jpg" alt="Markthalle">
+                    <div class="caption">
+                        <h3>Zentralmarkthalle <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1889-1891 | Zerstort 4.12.1943</div>
+                        <p>8.745 m2, 933 Stande, 34 m Uhrenturm.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('reformierte')">
+                    <img src="05_WILHELM_LEUSCHNER_Reformierte_Kirche.jpg" alt="Reformierte Kirche">
+                    <div class="caption">
+                        <h3>Reformierte Kirche <span class="tag survived">Wiederaufgebaut</span></h3>
+                        <div class="dates">Erbaut 1896-1899 | Wiederaufbau bis 1969</div>
+                        <p>73 m Turm, 1. Preis Pariser Weltausstellung 1900!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('markthalle2')">
+                    <img src="05_WILHELM_LEUSCHNER_Markthalle_Ansicht2.jpg" alt="Markthalle 2">
+                    <div class="caption">
+                        <h3>Markthalle (Ansicht 2) <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1889-1891 | Zerstort 4.12.1943</div>
+                        <p>Deutschlands erste Markthallen-Kuhlanlage!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('cafe-bauer')">
+                    <img src="05_WILHELM_LEUSCHNER_Cafe_Bauer_Rossplatz.jpg" alt="Cafe Bauer">
+                    <div class="caption">
+                        <h3>Cafe Bauer <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1889-1890 | Zerstort 4.12.1943</div>
+                        <p>1,5 Mio. Mark! Geoffnet bis 4 Uhr morgens!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('rossplatz')">
+                    <img src="05_WILHELM_LEUSCHNER_Rossplatz_Postkarte.jpg" alt="Rossplatz">
+                    <div class="caption">
+                        <h3>Rossplatz (Postkarte)</h3>
+                        <div class="dates">Historische Ansicht</div>
+                        <p>Prachtvolle Bebauung des Rossplatzes.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('polich')">
+                    <img src="05_WILHELM_LEUSCHNER_Kaufhaus_August_Polich.jpg" alt="Kaufhaus Polich">
+                    <div class="caption">
+                        <h3>Kaufhaus Polich <span class="tag destroyed">Abgerissen</span></h3>
+                        <div class="dates">Neubau 1887-1888 | Abgerissen 1935</div>
+                        <p>DEUTSCHLANDS ERSTE ROLLTREPPE! Dez. 1898</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('messe-wl')">
+                    <img src="05_WILHELM_LEUSCHNER_Messegebaeude.jpg" alt="Messegebaude">
+                    <div class="caption">
+                        <h3>Messegebaude</h3>
+                        <div class="dates">Historisches Messehaus</div>
+                        <p>Eines der vielen Messehauser Leipzigs.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('polizei')">
+                    <img src="05_WILHELM_LEUSCHNER_Polizei_neben_Bibo.jpg" alt="Polizei">
+                    <div class="caption">
+                        <h3>Polizeigebaude</h3>
+                        <div class="dates">Historische Ansicht</div>
+                        <p>Neben der Bibliotheca Albertina.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HONORABLE MENTIONS -->
+        <section class="stop honorable" id="stop6">
+            <div class="stop-header">
+                <div class="stop-number" style="background:#27ae60;">+</div>
+                <h2 class="stop-title">Honorable Mentions</h2>
+            </div>
+            <div class="stop-intro">
+                Diese Gebaude liegen nicht auf unserer Route, aber sind zu beeindruckend um sie nicht zu erwahnen!
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('pleissenburg')">
+                    <img src="06_HONORABLE_Alte_Pleissenburg.jpg" alt="Pleissenburg">
+                    <div class="caption">
+                        <h3>Alte Pleissenburg <span class="tag destroyed">Abgerissen</span></h3>
+                        <div class="dates">Mittelalter | Abgerissen 1897</div>
+                        <p>Leipziger Disputation 1519: Luther vs. Eck!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('boerse')">
+                    <img src="06_HONORABLE_Boerse_1.jpg" alt="Borse">
+                    <div class="caption">
+                        <h3>Neue Borse <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1884-1886 | Zerstort 4.12.1943</div>
+                        <p>100.000 Bande Wirtschaftsbibliothek!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('boerse2')">
+                    <img src="06_HONORABLE_Boerse_2.jpg" alt="Borse 2">
+                    <div class="caption">
+                        <h3>Borse (Ansicht 2)</h3>
+                        <div class="dates">Erbaut 1884-1886 | Zerstort 4.12.1943</div>
+                        <p>40.000 Bande (40%) unwiederbringlich verloren.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('albert-halle')">
+                    <img src="06_HONORABLE_Albert_Halle_Circus.jpg" alt="Albert-Halle">
+                    <div class="caption">
+                        <h3>Albert-Halle <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1886-1887 | Zerstort 4.12.1943</div>
+                        <p>3.500 Sitze, Walcker-Orgel mit 100 Registern!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('palmengarten')">
+                    <img src="06_HONORABLE_Palmengarten.jpg" alt="Palmengarten">
+                    <div class="caption">
+                        <h3>Palmengarten</h3>
+                        <div class="dates">Historisch</div>
+                        <p>Prachtvoller Veranstaltungsort.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('krystallpalast')">
+                    <img src="06_HONORABLE_Krystallpalast_Variete.jpg" alt="Krystallpalast">
+                    <div class="caption">
+                        <h3>Krystallpalast <span class="tag destroyed">Zerstort</span></h3>
+                        <div class="dates">Erbaut 1881-1882 | Zerstort 4.12.1943</div>
+                        <p>15.000 Personen! 10.600 Gaslampen!</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('nationen')">
+                    <img src="06_HONORABLE_Haus_der_Nationen.jpg" alt="Haus der Nationen">
+                    <div class="caption">
+                        <h3>Haus der Nationen</h3>
+                        <div class="dates">Messezeit</div>
+                        <p>"Reichsmessestadt Leipzig"</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('panorama')">
+                    <img src="06_HONORABLE_Panorama.jpg" alt="Panorama">
+                    <div class="caption">
+                        <h3>Panorama-Ausstellung</h3>
+                        <div class="dates">19. Jahrhundert</div>
+                        <p>360-Grad-Panoramabilder.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('naumann')">
+                    <img src="06_HONORABLE_Naumann_Braeu.jpg" alt="Naumann Brau">
+                    <div class="caption">
+                        <h3>Naumann-Brau</h3>
+                        <div class="dates">Historisch</div>
+                        <p>Historische Brauerei mit Kuppel.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('bleichert')">
+                    <img src="06_HONORABLE_Bleichert_Villa.jpg" alt="Bleichert Villa">
+                    <div class="caption">
+                        <h3>Bleichert-Villa</h3>
+                        <div class="dates">Grunderzeit</div>
+                        <p>Pionier der Seilbahntechnik.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('gefaengnis')">
+                    <img src="06_HONORABLE_Altes_Gefaengnis.jpg" alt="Gefangnis">
+                    <div class="caption">
+                        <h3>Altes Gefangnis</h3>
+                        <div class="dates">Historisch</div>
+                        <p>Imposantes Tor im Burgstil.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SONSTIGE -->
+        <section class="stop sonstige" id="stop7">
+            <div class="stop-header">
+                <div class="stop-number" style="background:#888;">?</div>
+                <h2 class="stop-title">Sonstige</h2>
+            </div>
+            <div class="images">
+                <div class="image-card" onclick="showDetail('volkshaus')">
+                    <img src="07_SONSTIGE_Volkshaus.jpg" alt="Volkshaus">
+                    <div class="caption">
+                        <h3>Volkshaus</h3>
+                        <div class="dates">Historisch</div>
+                        <p>Consum-Verein.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('harmonie')">
+                    <img src="07_SONSTIGE_Harmonie_Giebel.jpg" alt="Harmonie">
+                    <div class="caption">
+                        <h3>Harmonie</h3>
+                        <div class="dates">Historisch</div>
+                        <p>Gesellschaftshaus am Rossplatz.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('villa')">
+                    <img src="07_SONSTIGE_Villa_1888.jpg" alt="Villa">
+                    <div class="caption">
+                        <h3>Villa 1888</h3>
+                        <div class="dates">Erbaut 1888</div>
+                        <p>Prachtvolle Grunderzeitvilla.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('reichsgericht-u')">
+                    <img src="07_SONSTIGE_Reichsgericht_oder_Verwaltung.jpg" alt="Reichsgericht">
+                    <div class="caption">
+                        <h3>Verwaltungsgebaude</h3>
+                        <div class="dates">Standort unklar</div>
+                        <p>Grosses Verwaltungsgebaude.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('reichsgericht')">
+                    <img src="07_SONSTIGE_Reichsgericht.jpg" alt="Reichsgericht">
+                    <div class="caption">
+                        <h3>Reichsgericht <span class="tag survived">ERHALTEN</span></h3>
+                        <div class="dates">Erbaut 1888-1895</div>
+                        <p>Heute Bundesverwaltungsgericht.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('unbekannt')">
+                    <img src="07_SONSTIGE_Unbekanntes_Verwaltungsgebaeude.jpg" alt="Unbekannt">
+                    <div class="caption">
+                        <h3>Unbekanntes Gebaude</h3>
+                        <div class="dates">Nicht identifiziert</div>
+                        <p>Historischer Baukomplex.</p>
+                    </div>
+                </div>
+                <div class="image-card" onclick="showDetail('loewe')">
+                    <img src="07_SONSTIGE_Mascaron_Detail.jpg" alt="Lowen-Mascaron">
+                    <div class="caption">
+                        <h3>Lowen-Mascaron</h3>
+                        <div class="dates">Leipzig - Stadt der Lowen</div>
+                        <p>Lowe von Juda - Christussymbol.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="detail-modal" id="detailModal">
+        <span class="close" onclick="closeDetail()">&times;</span>
+        <div class="detail-content" id="detailContent">
+        </div>
+    </div>
+
+    <!-- Zoom Overlay -->
+    <div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom()">
+        <span class="close" onclick="closeZoom()">&times;</span>
+        <img id="zoomImage" src="" alt="Vollbild">
+    </div>
+
+    <script>
+        const buildingData = {
+            'paulinerkirche': {
+                title: 'Paulinerkirche / Universitatskirche St. Pauli',
+                img: '01_AUGUSTUSPLATZ_Paulinerkirche.jpg',
+                dates: {
+                    bau: '1231 (Weihe 1240)',
+                    zerstoerung: '30. Mai 1968, 9:58 Uhr',
+                    standzeit: '737 Jahre'
+                },
+                architekt: 'Dominikaner; Neugotik 1897/98 von Arwed Rossbach',
+                masse: 'ca. 66 m x 30 m, Turm ~58 m',
+                facts: [
+                    'Martin Luther weihte sie personlich am 12. August 1545',
+                    'Bach pruffte 1717 die Scheibe-Orgel, fuhrte Kantaten auf (BWV 198, BWV 226)',
+                    'Ca. 800 Graber unter der Kirche - 1968 heimlich geplundert!',
+                    'Ulbricht (in Leipzig geboren!): "Das Ding muss weg!"',
+                    '750 kg Sprengstoff zur Zerstorung',
+                    'Organist Kurt Grahl spielte Bachs Toccata C-Dur und markierte den letzten Ton'
+                ],
+                heute: 'Paulinum (2017, Erick van Egeraat) - 117 Mio. Euro. Die Fassade symbolisiert den Moment des Einsturzes.'
+            },
+            'augusteum': {
+                title: 'Augusteum (Universitatshauptgebaude)',
+                img: '01_AUGUSTUSPLATZ_Augusteum_Karyatiden.jpg',
+                dates: {
+                    bau: '1831-1836, Umbau 1892-1897',
+                    zerstoerung: 'Ausgebrannt 4.12.1943, gesprengt Juni 1968'
+                },
+                architekt: 'Albert Geutebruckk; Fassade nach Schinkel; Umbau: Arwed Rossbach',
+                kosten: 'ca. 2,85 Millionen Mark (Umbau)',
+                masse: 'Wandelhalle 23 m hoch, marmorverkleidet',
+                facts: [
+                    'Musenfiguren von Ernst Rietschel galten als verschollen',
+                    '2002 im Bundesverwaltungsgericht wiederentdeckt!',
+                    'Einziges Schinkel-Zeugnis in Leipzig - beim Umbau degradiert',
+                    'Beruhmte Studenten: Leibniz (1661), Goethe (1765), Lessing (1746)'
+                ],
+                heute: 'Neues Augusteum - Figuren heute dort ausgestellt.'
+            },
+            'alte-post': {
+                title: 'Alte Post / Oberpostdirektion',
+                img: '01_AUGUSTUSPLATZ_Alte_Post_Oberpostdirektion.jpg',
+                dates: {
+                    bau: '1836-1838, Umbau 1881-1884',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                architekt: 'Albert Geutebruckk; Umbau: August Kind',
+                masse: '87 m Hauptfront, Seitenflugel 28 m und 54 m',
+                facts: [
+                    '6 allegorische Figuren auf dem Dach von Joseph Kaffsack',
+                    '2 geflugelte: Telegraphie und Briefpost',
+                    '4 flugellose: Handel, Kunst, Wissenschaft, Gewerbe',
+                    'Bis zum Vortag der Zerstorung noch in Betrieb!'
+                ],
+                heute: 'DDR-Neubau (1961-64), erste Aluminium-Vorhangfassade der DDR. Jetzt "Das lebendige Haus" mit Motel One.'
+            },
+            'museum': {
+                title: 'Museum der bildenden Kunste',
+                img: '01_AUGUSTUSPLATZ_Museum_der_bildenden_Kuenste.jpg',
+                dates: {
+                    bau: '1856-1858',
+                    zerstoerung: '4. Dezember 1943, Ruine abgerissen 1962'
+                },
+                architekt: 'Ludwig Lange (Munchen)',
+                kosten: '150.875 Thaler, 18 Neugroschen und 1 Pfennig!',
+                masse: '41,8 m x 32,5 m, achteckige Lichtkuppel',
+                facts: [
+                    'Stifter Adolf Heinrich Schletter vermachte 33.050 Thaler',
+                    'Bedingung: Stadt muss binnen 5 Jahren Museum bauen',
+                    '61 Jahre durch Provisorien gewandert!',
+                    'Neubau eroffnete am 4.12.2004 - exakt am Jahrestag!',
+                    '1937: 394 Werke als "Entartete Kunst" beschlagnahmt'
+                ],
+                heute: 'Neubau seit 2004 am Sachsenplatz (74,5 Mio. Euro, 36 m hoch).'
+            },
+            'hansa-haus': {
+                title: 'Hansa-Haus / Messpalast Hansa',
+                img: '02_GRIMMAISCHE_Hansa_Haus_Messpalast.jpg',
+                dates: {
+                    bau: '1904-1906',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                architekt: 'Polster und Hohn (Leipzig)',
+                masse: 'Lichthof 600 m2, Ausstellungsflache 10.000 m2',
+                facts: [
+                    'Grosster Messebau seiner Zeit!',
+                    'Steinerner "Hanseaten-Kopf" am Giebel - 1928 verschwunden',
+                    'Im Vorgangerbau wohnte 1746 Gotthold Ephraim Lessing!',
+                    'Erstes Gebaude Leipzigs ausschliesslich fur Messezwecke',
+                    'Revolutionare Stahl-Glas-Konstruktion',
+                    'Meissner Fliesen, Merkurkopfe (Handelsgott)'
+                ],
+                heute: 'Neubau 1993-97, Innenhof originalgetreu rekonstruiert. 1996 "schonstes Gebaude des Jahres" (MIPIM Cannes).'
+            },
+            'cafe-felsche': {
+                title: 'Cafe Felsche',
+                img: '02_GRIMMAISCHE_Cafe_Felsche.jpg',
+                dates: {
+                    bau: 'Grundung 3. Oktober 1835',
+                    zerstoerung: '4. Dezember 1943',
+                    standzeit: '108 Jahre!'
+                },
+                architekt: 'Wilhelm Felsche (Grunder)',
+                facts: [
+                    'Eine der ersten Schokoladenproduktionen Deutschlands',
+                    '1862 "Koniglicher Hoflieferant"',
+                    'Spezialitat: Heisse Trinkschokolade',
+                    'Stammgaste: Gustav Mahler, Erich Kastner',
+                    'November 1848: Nach Hinrichtung von Robert Blum verwustet',
+                    '1916: Polizei empfahl Gardinen wegen hungernder Zuschauer',
+                    'Alter Schuldturm abgerissen - Baumaterial finanzierte Kaufpreis!'
+                ],
+                heute: 'Nachfolger Zetti produziert noch heute - u.a. Knusperflocken!'
+            },
+            'siegesdenkmal': {
+                title: 'Siegesdenkmal Leipzig',
+                img: '03_MARKT_Siegesdenkmal_Coloriert.jpg',
+                dates: {
+                    bau: 'Enthullt 18. August 1888',
+                    zerstoerung: 'Entfernt 12. Dezember 1946',
+                    standzeit: '58 Jahre'
+                },
+                kosten: '46.409 Goldmark (aus Grassi-Nachlass)',
+                masse: 'ca. 12 m hoch (Sockel 6 m), Germania 3,80 m',
+                facts: [
+                    'Bildhauer Rudolf Siemering (Berlin)',
+                    'Kaiser Wilhelm I. mit Lorbeerkranz, Schwert, Reichsapfel',
+                    '4 Reiterstatuen: Friedrich III., Konig Albert, Bismarck, Moltke',
+                    '8 Fahnentrager verschiedener deutscher Staaten',
+                    'Germania aus Kupfer getrieben',
+                    'Demontage OHNE Wissen der sowjetischen Kommandantur!',
+                    'Eingeschmolzen - ein Granitblock wurde Heinrich-Heine-Denkmal'
+                ],
+                heute: 'Nicht mehr vorhanden.'
+            },
+            'untergrund': {
+                title: 'Untergrund-Messhalle',
+                img: '03_MARKT_Untergrund_Messhalle.jpg',
+                dates: {
+                    bau: '23. Mai 1924 - Fruhjahr 1925',
+                    zerstoerung: 'Abgerissen 2005 (City-Tunnel)'
+                },
+                architekt: 'Carl Cramer; Eingang: Otto Droge (Art Deco)',
+                kosten: 'ca. 600.000 Mark',
+                masse: '98 m x 45 m, 6 m tief, 1.800 m2 fur 175 Aussteller',
+                facts: [
+                    'WELTWEIT ERSTES unterirdisches Ausstellungsgebaude!',
+                    '12.249 Pferdewagen-Fahrten fur Erdabtransport!',
+                    '4.800 Tonnen Kies, 120 Tonnen Eisen, 590 Tonnen Zement',
+                    'Bauzeit unter 1 Jahr (trotz 33 Tage Streik)',
+                    '1919: 2.000 Aussteller bekamen keinen Platz mehr',
+                    'Eingang aus Rochlitzer Porphyr (wie Altes Rathaus)'
+                ],
+                heute: 'Historischer Eingang originalgetreu rekonstruiert - sichtbar beim Betreten der S-Bahn-Station Markt!'
+            },
+            'commandantur': {
+                title: 'Commandantur Leipzig ("Trompeterschlosschen")',
+                img: '04_THOMASRING_Commandantur.jpg',
+                dates: {
+                    bau: '1898-1899',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                masse: 'ca. 41 m Grundseite, 23 m Hohe',
+                facts: [
+                    'Spitzname wegen goldener Trompeterfiguren auf dem Dach',
+                    'Sitz des Kommandierenden Generals',
+                    'Leipzig: zweitwichtigster Garnisonsstandort Sachsens',
+                    'ca. 8.000 Militarangehorige in Leipzig'
+                ],
+                heute: 'DDR-Zweckbau (ehem. Rechenzentrum), jetzt Tanz-Club Twenty One.'
+            },
+            'centraltheater': {
+                title: 'Centraltheater Leipzig',
+                img: '04_THOMASRING_Centraltheater.jpg',
+                dates: {
+                    bau: '1900-1902',
+                    zerstoerung: '4.12.1943 (Gastrotrakt), 20.2.1944 (Festsaal)'
+                },
+                architekt: 'August Hermann Schmidt & Arthur Johlige',
+                masse: '4.386 m2, Theatersaal 1.852 Platze, Festsaal 1.152 Platze',
+                facts: [
+                    'Dreitagige Einweihungsfeier 28.-30. August 1902!',
+                    'Top 3 Operettenbuhne deutschsprachig (neben Berlin, Wien)',
+                    'Oktober 1906: Franz Lehar dirigiert personlich',
+                    '1927: "No, No, Nanette" - erstes Musical in Leipzig!',
+                    'Richard Tauber und Fritzi Massary traten auf',
+                    'Weinrestaurant, Cafe-Kabarett, drei Kegelbahnen, Dachterrasse',
+                    '1931: Judisches Bankhaus Kroch kaufte - nach 1933 "Arisierung"'
+                ],
+                heute: 'Schauspiel Leipzig (Neubau 1954-57, 672 Platze).'
+            },
+            'albertina': {
+                title: 'Bibliotheca Albertina',
+                img: '05_WILHELM_LEUSCHNER_Bibliotheca_Albertina.jpg',
+                dates: {
+                    bau: 'Juni 1887 - 24. Oktober 1891',
+                    zerstoerung: '6. April 1945: Zwei Drittel zerstort',
+                    wiederaufbau: '1992-2002'
+                },
+                architekt: 'Max Arwed Rossbach (Semperschule)',
+                kosten: '2,3-2,6 Mio. Reichsmark; Wiederaufbau 64-65 Mio. Euro',
+                masse: '107 m Lange, 25 Fensterachsen, 4 Etagen',
+                facts: [
+                    '5,5 Millionen Bande heute',
+                    '60 Kilometer Regale!',
+                    '4 Gutenberg-Bibeln auf Pergament!',
+                    'Papyrus Ebers: 18,63 m - alteste Medizinrolle der Welt (1525 v.Chr.)',
+                    'Fast 50 Jahre als Teilruine betrieben!',
+                    'Wiedereroffnung 24.10.2002 - exakt 111 Jahre nach Ersteroffnung',
+                    '16 Statuen + 16 Medaillons: Dante, Leibniz, Shakespeare, Durer'
+                ],
+                heute: 'Einer der bedeutendsten Neorenaissance-Bauten Deutschlands. ERHALTEN!'
+            },
+            'grassi': {
+                title: 'Altes Grassimuseum',
+                img: '05_WILHELM_LEUSCHNER_Grassimuseum_Alt.jpg',
+                dates: {
+                    bau: '1894-1897',
+                    eroeffnung: '5. Februar 1896'
+                },
+                architekt: 'Hugo Licht (auch Neues Rathaus)',
+                facts: [
+                    'Stifter Franz Dominic Grassi (1801-1880)',
+                    'Spitzname: "Der Holznutscher" - kaute stets auf Zahnstocher',
+                    'Vermachtnis: 2.327.423,11 Goldmark (heute >20 Mio. Euro!)',
+                    '"Zur allgemeinen Verschonerung der Stadt"',
+                    'Grassi starb, wurde sofort bestattet - Stunden spater erfuhr OB vom Erbe',
+                    'Eine Woche spater war Museum beschlossen!',
+                    '12 kolossale korinthische Halbsaulen'
+                ],
+                heute: 'Altestes erhaltenes Museumsgebaude Leipzigs - heute Stadtbibliothek. ERHALTEN!'
+            },
+            'markthalle': {
+                title: 'Zentralmarkthalle Leipzig',
+                img: '05_WILHELM_LEUSCHNER_Markthalle.jpg',
+                dates: {
+                    bau: '23. Juli 1889 - 26. Mai 1891 (nur 22 Monate!)',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                architekt: 'Hugo Licht',
+                masse: '8.745 m2, Sudfront 140 m, Uhrenturm 34 m, 933 Stande',
+                facts: [
+                    'Deutschlands erste Markthallen-Kuhlanlage! (Ammoniak)',
+                    '20 elektrische Bogenlampen (eigene Dampfmaschine)',
+                    '6 hydraulische Warenaufzuge',
+                    '42.000 Kubikmeter Erdaushub',
+                    'Uhrenturm mit Villeroy & Boch Terrakotta',
+                    'Wetterfahne mit Leipziger Stadtlowen',
+                    'Offnung 4:00 Uhr, uber 200 Pferdewagen taglich!'
+                ],
+                heute: 'Brachflache. Geplant: Neue Markthalle + Bildungscampus.'
+            },
+            'reformierte': {
+                title: 'Reformierte Kirche Leipzig',
+                img: '05_WILHELM_LEUSCHNER_Reformierte_Kirche.jpg',
+                dates: {
+                    bau: '1896-1899',
+                    zerstoerung: '4. Dezember 1943',
+                    wiederaufbau: 'bis 1969'
+                },
+                architekt: 'Georg Weidenbach & Richard Tschammer',
+                masse: 'Turm 73 m',
+                facts: [
+                    '1. Preis Pariser Weltausstellung 1900!',
+                    'Deutschlands erstes einheitliches Gemeindezentrum',
+                    'Gemeinde 1700 von franzosischen Hugenotten gegrundet',
+                    'Pfarrer Specht, 5 Kinder und Gemeindehelferin starben 1943',
+                    '9. Oktober 1989: Burgerrechtler filmten heimlich vom Turm!',
+                    'Aram Radomski und Siegbert Schefke - Aufnahmen in ARD',
+                    'Machten die Montagsdemo weltbekannt!'
+                ],
+                heute: 'Aktive Gemeinde (~1.250 Mitglieder). Wiederaufgebaut. ERHALTEN!'
+            },
+            'cafe-bauer': {
+                title: 'Cafe Bauer',
+                img: '05_WILHELM_LEUSCHNER_Cafe_Bauer_Rossplatz.jpg',
+                dates: {
+                    bau: '1889-1890',
+                    zerstoerung: '4. Dezember 1943',
+                    betrieb: '1890-1922 (32 Jahre)'
+                },
+                architekt: 'Albert Bohm (Berlin)',
+                kosten: '1,5 Millionen Mark',
+                masse: '4 Geschosse, 85 m tiefes Grundstuck',
+                facts: [
+                    'Geoffnet bis 4 Uhr morgens!',
+                    'Lesesaal, Billardsaal, prunkvolle Restaurantsale',
+                    '1922 wirtschaftliche Schwierigkeiten - Schliessung',
+                    'Wiedereroffnung als "Kaffee Astra" in 1930ern erfolglos'
+                ],
+                heute: 'Grundstuck bis heute unbebaut! Soll in Einheits- und Freiheitsdenkmal einbezogen werden.'
+            },
+            'polich': {
+                title: 'Kaufhaus August Polich',
+                img: '05_WILHELM_LEUSCHNER_Kaufhaus_August_Polich.jpg',
+                dates: {
+                    bau: 'Grundung 1866, Neubau 1887-1888',
+                    zerstoerung: 'Abgerissen 1935 (fur C&A)'
+                },
+                architekt: 'Arwed Rossbach',
+                facts: [
+                    'DEUTSCHLANDS ERSTE ROLLTREPPE! Dezember 1898',
+                    'Zeitgleich mit Londons Harrods!',
+                    'Hersteller: Peniger Maschinenfabrik',
+                    '"Als Kind war Hohepunkt eines Tagesausflugs, bei Polich Rolltreppe zu fahren!"',
+                    'Eigener Versandhandel, Waschefabriken',
+                    'Verlag der Deutschen Modenzeitung',
+                    'August Polich: Mitglied im "Verein zur Abwehr des Antisemitismus"',
+                    '1932 Konkurs durch Weltwirtschaftskrise',
+                    'Leipziger boykottierten anfangs C&A aus Groll!'
+                ],
+                heute: 'C&A-Merkurhaus steht an dieser Stelle.'
+            },
+            'boerse': {
+                title: 'Neue Borse am Trondlinring',
+                img: '06_HONORABLE_Boerse_1.jpg',
+                dates: {
+                    bau: '1884-1886, Erweiterung 1911',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                architekt: 'Hans Enger & Karl Weichardt',
+                facts: [
+                    '100.000 Bande Wirtschaftsbibliothek!',
+                    '3 m hohe Lipsia-Stadtgottin im Giebel (Adolf Lehnert)',
+                    '40.000 Bande (40%) unwiederbringlich verloren',
+                    'Im Keller wurde bis 1958 Bier ausgeschenkt!',
+                    '15 Jahre nach Zerstorung des Gebaudes!'
+                ],
+                heute: 'InterCityHotel Leipzig (seit April 2013).'
+            },
+            'krystallpalast': {
+                title: 'Krystallpalast / Variete-Theater',
+                img: '06_HONORABLE_Krystallpalast_Variete.jpg',
+                dates: {
+                    bau: '1881-1882 (Krystallpalast)',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                architekt: 'Carl Planer',
+                masse: 'Theatersaal ca. 800 m2, Gesamtkapazitat 15.000 Personen!',
+                facts: [
+                    '10.600 Gaslampen - marchenhafte Lichtpracht!',
+                    'Eisen-Glas-Konstruktion nach Londoner Crystal Palace',
+                    'Josephine Baker trat auf!',
+                    'Grock - beruhmtester Clown der Welt',
+                    'Johann Strauss mit Orchester (1877)',
+                    '25.2.1898: Urauffuhrung Wedekinds "Erdgeist"',
+                    'Kaiser Wilhelm I. und Konig Johann von Sachsen als Besucher',
+                    'Nachgebaute Burg, Grotte, hydraulische Wasserspiele'
+                ],
+                heute: 'Quartier Krystallpalast (2022). Krystallpalast Variete in der Magazingasse seit 1997.'
+            },
+            'albert-halle': {
+                title: 'Albert-Halle',
+                img: '06_HONORABLE_Albert_Halle_Circus.jpg',
+                dates: {
+                    bau: '1886-1887',
+                    zerstoerung: '4. Dezember 1943'
+                },
+                architekt: 'Arwed Rossbach',
+                masse: 'Durchmesser 36-46 m, Hohe 36 m, 3.000-3.500 Sitze',
+                facts: [
+                    'Benannt nach Konig Albert von Sachsen',
+                    'Walcker-Orgel mit 3 Manualen und 100 Registern!',
+                    'Winterspielstatte fur Zirkus Renz, Schumann, Busch',
+                    'Stallungen fur Tiere direkt angeschlossen',
+                    '1918-1925: Grosstes Kino der Stadt (2.300 Sitze)',
+                    'Bei Marine-Ausstellung: Leipziger Schuler zur Besichtigung gefuhrt'
+                ],
+                heute: 'Nicht mehr vorhanden.'
+            },
+            'pleissenburg': {
+                title: 'Alte Pleissenburg',
+                img: '06_HONORABLE_Alte_Pleissenburg.jpg',
+                dates: {
+                    bau: 'Mittelalter',
+                    zerstoerung: 'Abgerissen 1897'
+                },
+                facts: [
+                    'Mittelalterliche Burg, spater Kaserne',
+                    '1519: Beruhmte Leipziger Disputation',
+                    'Martin Luther vs. Johannes Eck!',
+                    'Wich dem Neuen Rathaus',
+                    'Hugo Licht nutzte den Burgturm als Vorbild fur Rathausturm'
+                ],
+                heute: 'Neues Rathaus steht an dieser Stelle.'
+            },
+            'loewe': {
+                title: 'Lowen-Mascaron',
+                img: '07_SONSTIGE_Mascaron_Detail.jpg',
+                dates: {
+                    info: 'Leipzig - Stadt der Lowen'
+                },
+                facts: [
+                    'Der Lowe als Christussymbol - "Lowe von Juda"',
+                    'Leipzig ist voll von Lowen-Darstellungen',
+                    'Vom Neuen Rathaus bis zu historischen Fassaden',
+                    'In christlicher Tradition: gerechte Herrschaft, gottliche Autoritat',
+                    'Majestattisch und barmherzig, wild und rein',
+                    'Herrscher und Erloser',
+                    'Symbole in alter Architektur waren nie zufallig',
+                    'Stadte wurden mit Bedeutung gebaut'
+                ],
+                heute: 'Der Lowe bleibt Symbol Leipzigs.'
+            }
+        };
+
+        let currentImageSrc = '';
+
+        function showDetail(id) {
+            const data = buildingData[id];
+            if (!data) {
+                // Fallback for buildings without detailed data - still show the image
+                const card = document.querySelector(`[onclick="showDetail('${id}')"]`);
+                const imgSrc = card ? card.querySelector('img').src : '';
+                const imgAlt = card ? card.querySelector('img').alt : '';
+                currentImageSrc = imgSrc;
+                document.getElementById('detailModal').classList.add('active');
+                document.getElementById('detailContent').innerHTML = `
+                    <div class="detail-hero-image" onclick="openZoom()">
+                        <img src="${imgSrc}" alt="${imgAlt}">
+                        <span class="zoom-hint">Antippen zum Vergrossern</span>
+                    </div>
+                    <p style="text-align:center; padding:20px; color:#888;">Detailinformationen werden noch erganzt.</p>
+                `;
+                document.body.style.overflow = 'hidden';
+                return;
+            }
+
+            currentImageSrc = data.img;
+            let html = `<div class="detail-hero-image" onclick="openZoom()">
+                <img src="${data.img}" alt="${data.title}">
+                <span class="zoom-hint">Antippen zum Vergrossern</span>
+            </div>`;
+            html += `<h2>${data.title}</h2>`;
+
+            // Dates section
+            html += `<div class="detail-dates">`;
+            if (data.dates.bau) html += `<span><strong>Erbaut:</strong> ${data.dates.bau}</span>`;
+            if (data.dates.eroeffnung) html += `<span><strong>Eroffnung:</strong> ${data.dates.eroeffnung}</span>`;
+            if (data.dates.zerstoerung) html += `<span><strong>Zerstort:</strong> ${data.dates.zerstoerung}</span>`;
+            if (data.dates.wiederaufbau) html += `<span><strong>Wiederaufbau:</strong> ${data.dates.wiederaufbau}</span>`;
+            if (data.dates.standzeit) html += `<span><strong>Standzeit:</strong> ${data.dates.standzeit}</span>`;
+            if (data.dates.betrieb) html += `<span><strong>Betrieb:</strong> ${data.dates.betrieb}</span>`;
+            if (data.dates.info) html += `<span>${data.dates.info}</span>`;
+            html += `</div>`;
+
+            // Info section
+            if (data.architekt || data.kosten || data.masse) {
+                html += `<div class="detail-section"><h4>Technische Daten</h4>`;
+                if (data.architekt) html += `<p><strong>Architekt:</strong> ${data.architekt}</p>`;
+                if (data.kosten) html += `<p><strong>Kosten:</strong> ${data.kosten}</p>`;
+                if (data.masse) html += `<p><strong>Masse:</strong> ${data.masse}</p>`;
+                html += `</div>`;
+            }
+
+            // Facts
+            if (data.facts && data.facts.length > 0) {
+                html += `<div class="detail-section"><h4>Fakten & Geschichten</h4><ul>`;
+                data.facts.forEach(fact => {
+                    html += `<li>${fact}</li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            // Today
+            if (data.heute) {
+                html += `<div class="detail-fact detail-today"><strong>Heute:</strong> ${data.heute}</div>`;
+            }
+
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('detailModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openZoom() {
+            document.getElementById('zoomImage').src = currentImageSrc;
+            document.getElementById('zoomOverlay').classList.add('active');
+        }
+
+        function closeZoom() {
+            document.getElementById('zoomOverlay').classList.remove('active');
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('zoomOverlay').classList.contains('active')) {
+                    closeZoom();
+                } else {
+                    closeDetail();
+                }
+            }
+        });
+
+        // Smooth scroll for nav
+        document.querySelectorAll('nav a').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector(a.getAttribute('href')).scrollIntoView({behavior: 'smooth'});
+            });
+        });
+    </script>
+</body>
+</html>

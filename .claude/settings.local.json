@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ren \"photo_2025-11-12_17-47-58.jpg\" \"Altes_Gefaengnis_Burgtor_Leipzig.jpg\")",
+      "Bash(ren:*)",
+      "Bash(powershell:*)",
+      "WebSearch",
+      "Bash(start index.html)",
+      "Bash(start \"\" \"C:\\Users\\kreyh\\Projekte\\leipzig\\index.html\")",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
