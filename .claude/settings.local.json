@@ -8,7 +8,14 @@
       "Bash(start index.html)",
       "Bash(start \"\" \"C:\\Users\\kreyh\\Projekte\\leipzig\\index.html\")",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nLeipzig Tour - Mobile-optimierte Stadtfuehrung\n\n- Interaktive Webseite fuer 1-stuendige Stadtfuehrung durch Leipzig\n- 5 Stops: Augustusplatz, Grimmaische Str, Markt, Thomasring, W-Leuschner-Platz\n- 48 historische Fotos von zerstoerten/erhaltenen Gebaeuden\n- Detail-Modal mit grossem Bild und Zoom-Funktion\n- Historische Fakten zum 4. Dezember 1943 (Bombenangriff)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git remote:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo view:*)",
+      "WebFetch(domain:docs.github.com)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
