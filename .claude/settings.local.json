@@ -16,7 +16,8 @@
       "Bash(gh repo view:*)",
       "WebFetch(domain:docs.github.com)",
       "Bash(git commit:*)",
-      "WebFetch(domain:api.qrserver.com)"
+      "WebFetch(domain:api.qrserver.com)",
+      "WebFetch(domain:goqr.me)"
     ],
     "deny": [],
     "ask": []
