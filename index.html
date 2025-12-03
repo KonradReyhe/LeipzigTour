@@ -335,11 +335,22 @@
         <div id="qrModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:2000;justify-content:center;align-items:center;flex-direction:column;">
             <span onclick="toggleQR()" style="position:absolute;top:15px;right:20px;font-size:2rem;cursor:pointer;">&times;</span>
             <div style="background:#fff;padding:20px;border-radius:12px;">
-                <img src="qrcode.svg" alt="QR Code" width="250" height="250" style="display:block;">
+                <div id="qrcode"></div>
             </div>
             <p style="color:#fff;margin-top:20px;font-size:1rem;">konradreyhe.github.io/LeipzigTour</p>
             <p style="color:#888;margin-top:10px;font-size:0.8rem;">Scannen zum Teilen</p>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+        <script>
+            new QRCode(document.getElementById("qrcode"), {
+                text: "https://konradreyhe.github.io/LeipzigTour/",
+                width: 250,
+                height: 250,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        </script>
         <div class="intro-box">
             <strong>4. Dezember 1943, 3:50 Uhr:</strong> 432 britische Bomber warfen uber 294.000 Bomben. Uber 1.800 Tote, 43.100 Wohnungen zerstort. Fast alle Gebaude dieser Tour fielen in 35 Minuten.
         </div>
