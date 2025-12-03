@@ -17,7 +17,8 @@
       "WebFetch(domain:docs.github.com)",
       "Bash(git commit:*)",
       "WebFetch(domain:api.qrserver.com)",
-      "WebFetch(domain:goqr.me)"
+      "WebFetch(domain:goqr.me)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
